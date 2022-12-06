@@ -19,21 +19,22 @@ class TemeBot(commands.Bot):
             await self.load_extension(extension)
 
         if self.testing_guild_id:
-            print("Setting commands to test guild")
+            print("Deploying commands to test guild")
             guild = discord.Object(self.testing_guild_id)
             self.tree.copy_global_to(guild = guild)
-            await self.tree.sync(guild = guild) 
+            await self.tree.sync(guild = guild)
 
 
-async def main():
+async def main(test: bool =False):
     load_dotenv()
 
     intents = discord.Intents.default()
 
     async with ClientSession() as my_client:
-        exts = ["command_test"]
-        async with TemeBot(commands.when_mentioned, web_client=my_client, initial_extensions=exts, testing_guild_id=os.getenv("TEST_SERVER"), intents=intents) as bot:
+        exts = ["command_test", "voice_commands"]
+        testing_guild_id = os.getenv("TEST_SERVER") if test else None
+        async with TemeBot(commands.when_mentioned, web_client=my_client, initial_extensions=exts, testing_guild_id=testing_guild_id, intents=intents) as bot:
             await bot.start(os.getenv('TOKEN', ''))
 
 
-asyncio.run(main())
+asyncio.run(main(test=True))
